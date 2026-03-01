@@ -1,0 +1,74 @@
+name: openmeteo
+base_url: https://api.open-meteo.com
+protocol: rest
+# No auth required — Open-Meteo is a free, open weather API
+endpoints:
+  forecast:
+    description: "Get weather forecast for a location by latitude and longitude"
+    path: /v1/forecast
+    method: GET
+    params:
+      latitude:
+        type: number
+        required: true
+        description: "Latitude of the location"
+      longitude:
+        type: number
+        required: true
+        description: "Longitude of the location"
+      current_weather:
+        type: boolean
+        required: false
+        default: true
+        description: "Include current weather conditions"
+      hourly:
+        type: string
+        required: false
+        description: "Comma-separated list of hourly variables (e.g. temperature_2m,windspeed_10m)"
+      daily:
+        type: string
+        required: false
+        description: "Comma-separated list of daily variables (e.g. temperature_2m_max,precipitation_sum)"
+      temperature_unit:
+        type: string
+        required: false
+        enum: [celsius, fahrenheit]
+        default: celsius
+      windspeed_unit:
+        type: string
+        required: false
+        enum: [kmh, ms, mph, kn]
+        default: kmh
+      timezone:
+        type: string
+        required: false
+        description: "Timezone name (e.g. America/New_York, auto)"
+        default: auto
+      forecast_days:
+        type: integer
+        required: false
+        description: "Number of forecast days (1-16)"
+        default: 7
+    timeout_ms: 8000
+
+  air_quality:
+    description: "Get air quality forecast for a location"
+    path: /v1/air-quality
+    method: GET
+    params:
+      latitude:
+        type: number
+        required: true
+      longitude:
+        type: number
+        required: true
+      hourly:
+        type: string
+        required: false
+        description: "Comma-separated variables: pm10,pm2_5,carbon_dioxide,european_aqi,us_aqi"
+        default: european_aqi,us_aqi
+      timezone:
+        type: string
+        required: false
+        default: auto
+    timeout_ms: 8000

@@ -1,0 +1,114 @@
+name: github
+base_url: https://api.github.com
+protocol: rest
+auth:
+  type: bearer
+  resolve:
+    strategy: env
+    key: GITHUB_TOKEN
+  inject:
+    strategy: header
+    name: Authorization
+    prefix: "Bearer "
+endpoints:
+  get_issue:
+    description: "Get a single issue from a GitHub repository"
+    path: /repos/{owner}/{repo}/issues/{issue_number}
+    method: GET
+    params:
+      owner:
+        type: string
+        required: true
+        description: "Repository owner (user or organization)"
+      repo:
+        type: string
+        required: true
+        description: "Repository name"
+      issue_number:
+        type: integer
+        required: true
+        description: "Issue number"
+    timeout_ms: 5000
+
+  list_issues:
+    description: "List issues for a GitHub repository"
+    path: /repos/{owner}/{repo}/issues
+    method: GET
+    params:
+      owner:
+        type: string
+        required: true
+      repo:
+        type: string
+        required: true
+      state:
+        type: string
+        required: false
+        enum: [open, closed, all]
+        default: open
+      per_page:
+        type: integer
+        required: false
+        default: 30
+    timeout_ms: 5000
+
+  get_repo:
+    description: "Get metadata for a GitHub repository"
+    path: /repos/{owner}/{repo}
+    method: GET
+    params:
+      owner:
+        type: string
+        required: true
+      repo:
+        type: string
+        required: true
+    timeout_ms: 5000
+
+  create_issue:
+    description: "Create a new issue in a GitHub repository"
+    path: /repos/{owner}/{repo}/issues
+    method: POST
+    params:
+      owner:
+        type: string
+        required: true
+      repo:
+        type: string
+        required: true
+      title:
+        type: string
+        required: true
+        description: "Issue title"
+      body:
+        type: string
+        required: false
+        description: "Issue body (Markdown)"
+      labels:
+        type: array
+        required: false
+    timeout_ms: 10000
+
+  search_repos:
+    description: "Search GitHub repositories"
+    path: /search/repositories
+    method: GET
+    params:
+      q:
+        type: string
+        required: true
+        description: "Search query"
+      sort:
+        type: string
+        required: false
+        enum: [stars, forks, help-wanted-issues, updated]
+      order:
+        type: string
+        required: false
+        enum: [asc, desc]
+        default: desc
+      per_page:
+        type: integer
+        required: false
+        default: 10
+    timeout_ms: 5000

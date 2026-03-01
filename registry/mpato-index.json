@@ -1,0 +1,25 @@
+{
+  "$schema": "https://mpato.dev/schemas/index/v1.json",
+  "mpato_index_version": "1",
+  "name": "MPATO Community Registry",
+  "description": "Official bundled service definitions for MPATO. Hostable on any static file server or CDN.",
+  "url": "https://raw.githubusercontent.com/your-org/mpato/main/registry/mpato-index.json",
+  "services": [
+    {
+      "name": "github",
+      "description": "GitHub REST API — issues, repos, search, and more",
+      "version": "1.0.0",
+      "auth_type": "bearer",
+      "tags": ["vcs", "issues", "code", "collaboration"],
+      "definition": "github.yaml"
+    },
+    {
+      "name": "openmeteo",
+      "description": "Open-Meteo weather forecast API — free, no auth required",
+      "version": "1.0.0",
+      "auth_type": "none",
+      "tags": ["weather", "forecast", "climate", "free"],
+      "definition": "openmeteo.yaml"
+    }
+  ]
+}
