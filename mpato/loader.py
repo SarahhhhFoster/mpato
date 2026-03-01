@@ -21,6 +21,8 @@ VALID_RESOLVE_STRATEGIES = {"env", "file", "static"}
 VALID_INJECT_STRATEGIES = {"header", "query", "body"}
 VALID_HTTP_METHODS = {"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
 VALID_PARAM_TYPES = {"string", "integer", "number", "boolean", "array", "object"}
+VALID_PARAM_IN = {"path", "query", "body", "header"}
+VALID_BODY_ENCODINGS = {"json", "form", "multipart"}
 
 
 class DefinitionError(Exception):
@@ -94,6 +96,13 @@ def _validate_params(params: dict, endpoint_name: str, service_name: str):
                 f"Invalid param type '{p_type}' for '{param_name}' in "
                 f"endpoint '{endpoint_name}' of '{service_name}'"
             )
+        p_in = param_def.get("in", "")
+        if p_in and p_in.lower() not in VALID_PARAM_IN:
+            raise DefinitionError(
+                f"Invalid 'in' value '{p_in}' for param '{param_name}' in "
+                f"endpoint '{endpoint_name}' of '{service_name}'. "
+                f"Must be one of: {VALID_PARAM_IN}"
+            )
 
 
 def _validate_endpoint(name: str, ep: dict, protocol: str, service_name: str):
@@ -114,6 +123,12 @@ def _validate_endpoint(name: str, ep: dict, protocol: str, service_name: str):
                 f"Invalid method '{method}' for endpoint '{name}' in '{service_name}'"
             )
         ep["method"] = method
+        body_encoding = ep.get("body_encoding", "json").lower()
+        if body_encoding not in VALID_BODY_ENCODINGS:
+            raise DefinitionError(
+                f"Invalid body_encoding '{body_encoding}' for endpoint '{name}' "
+                f"in '{service_name}'. Must be one of: {VALID_BODY_ENCODINGS}"
+            )
 
     if "params" in ep:
         _validate_params(ep["params"], name, service_name)

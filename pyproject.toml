@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mpato"
+version = "0.2.0"
+description = "Multi-Protocol Agent Tool Operator — invoke any REST or WebSocket API via declarative definition files"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "GPL-3.0-or-later" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "requests>=2.28",
+]
+
+[project.optional-dependencies]
+wss = ["websocket-client>=1.6"]
+all = ["websocket-client>=1.6"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mpato*"]

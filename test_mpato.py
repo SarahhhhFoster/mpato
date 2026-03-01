@@ -4,6 +4,39 @@ Tests for MPATO library — validates loader, auth, dispatcher, and MCP shim.
 
 import json
 import os
+
+LIVE = os.environ.get("MPATO_LIVE_TESTS", "").lower() in ("1", "true", "yes")
+
+def live(label):
+    """Wrapper that skips live network tests unless MPATO_LIVE_TESTS=1."""
+    import contextlib
+    @contextlib.contextmanager
+    def _ctx():
+        global PASS, FAIL
+        if not LIVE:
+            print(f"  ~ {label} (skipped — set MPATO_LIVE_TESTS=1 to run)")
+            yield  # yield so the with-block body runs but we catch everything
+            return
+        try:
+            yield
+            print(f"  ✓ {label}")
+            PASS += 1
+        except Exception as e:
+            print(f"  ✗ {label}")
+            print(f"      {type(e).__name__}: {e}")
+            FAIL += 1
+    # When not LIVE, wrap in a suppressor so assertions/errors are swallowed
+    if not LIVE:
+        @contextlib.contextmanager
+        def _skip():
+            try:
+                yield
+            except Exception:
+                pass
+            print(f"  ~ {label} (skipped — set MPATO_LIVE_TESTS=1 to run)")
+        return _skip()
+    return _ctx()
+
 import sys
 import tempfile
 
@@ -210,6 +243,9 @@ def test_registry_missing_required_param():
 
 
 def test_registry_openmeteo_call():
+    if not LIVE:
+        print("  ~ test_registry_openmeteo_call (skipped -- set MPATO_LIVE_TESTS=1)")
+        return
     """Actually call Open-Meteo (no auth needed, public API)."""
     from mpato import ServiceRegistry
     r = ServiceRegistry()
@@ -272,6 +308,9 @@ def test_mcp_tools_required_params():
 
 
 def test_mcp_dispatch_live():
+    if not LIVE:
+        print("  ~ test_mcp_dispatch_live (skipped -- set MPATO_LIVE_TESTS=1)")
+        return
     """Test MCP dispatch with a live Open-Meteo call."""
     from mpato import ServiceRegistry
     from mpato.shims.mcp import MCPShim
@@ -354,6 +393,9 @@ def test_result_raise_for_error_success():
 # ──────────────────────────────────────────────────────────────────────────────
 
 def test_async_callback():
+    if not LIVE:
+        print("  ~ test_async_callback (skipped -- set MPATO_LIVE_TESTS=1)")
+        return
     import threading
     from mpato import ServiceRegistry
     r = ServiceRegistry().load("definitions/openmeteo.yaml")

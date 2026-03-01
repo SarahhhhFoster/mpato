@@ -245,12 +245,32 @@ class ServiceRegistry:
                 f"Available services: {list(self._definitions.keys())}"
             )
 
-    def __del__(self):
-        # Attempt graceful teardown of WSS connections on GC
-        try:
-            for name in list(self._definitions.keys()):
-                defn = self._definitions.get(name, {})
-                if defn.get("protocol") == "wss":
+    # ------------------------------------------------------------------
+    # Context manager + explicit close
+    # ------------------------------------------------------------------
+
+    def close(self) -> None:
+        """
+        Explicitly close all open WebSocket connections.
+        Prefer this over relying on garbage collection.
+        """
+        for name in list(self._definitions.keys()):
+            defn = self._definitions.get(name, {})
+            if defn.get("protocol") == "wss":
+                try:
                     self._dispatcher.disconnect(defn)
+                except Exception:
+                    pass
+
+    def __enter__(self) -> "ServiceRegistry":
+        return self
+
+    def __exit__(self, *_) -> None:
+        self.close()
+
+    def __del__(self):
+        # Best-effort fallback; prefer explicit close() or context manager.
+        try:
+            self.close()
         except Exception:
             pass

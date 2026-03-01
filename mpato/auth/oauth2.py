@@ -54,6 +54,14 @@ class OAuth2TokenCache:
 _global_cache = OAuth2TokenCache()
 
 
+def invalidate_oauth2_token(auth_config: dict, service_name: str):
+    """Force-expire a cached token so the next get_oauth2_token() fetches a fresh one."""
+    token_url = auth_config.get("token_url", "")
+    client_id_config = auth_config.get("client_id", "")
+    client_id = str(client_id_config) if not isinstance(client_id_config, dict) else ""
+    _global_cache.invalidate(token_url, client_id)
+
+
 def get_oauth2_token(auth_config: dict, service_name: str) -> str:
     """
     Obtain an OAuth2 bearer token using client credentials flow.

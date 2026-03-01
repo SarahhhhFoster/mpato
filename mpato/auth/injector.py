@@ -40,4 +40,10 @@ def inject_credential(
         else:
             body = {name: credential}
 
+    elif strategy:
+        raise ValueError(
+            f"Unknown inject strategy '{strategy}'. "
+            f"Must be one of: header, query, body"
+        )
+
     return headers, params, body
